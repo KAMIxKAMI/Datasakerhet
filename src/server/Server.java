@@ -74,6 +74,7 @@ public class Server implements Runnable {
 				out.println("Authenticated");
 				out.flush();
 				// fix commands
+				System.err.println("Röd vann");
 				while ((clientMsg = in.readLine()) != null) {
 					String reply = executeCommand(
 							sendRequest("Enter a command: ", in, out), in, out,
@@ -190,10 +191,11 @@ public class Server implements Runnable {
 				KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
 				char[] password = "password".toCharArray();
-				String filePath = "./cert/server/Server/serverkeystore";
 				ks.load(new FileInputStream(
-						filePath),
+						"./cert/server/Server/serverkeystore"),
 						password); // keystore
+				ts.load(new FileInputStream("./cert/server/Server/servertruststore"),
+						password);
 				// password
 				// (storepass)
 				// password

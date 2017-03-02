@@ -42,14 +42,12 @@ public class Client {
 						.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
 
-				ks.load(new FileInputStream(
-						"./cert/client/"
-								+ user + "/clientkeystore"), password); // keystore);
+				ks.load(new FileInputStream("./cert/client/" + user
+						+ "/clientkeystore"), password); // keystore);
 				// password
 				// (storepass)
-				ts.load(new FileInputStream(
-						"./cert/client/"
-								+ user + "/clienttruststore"), password); // truststore
+				ts.load(new FileInputStream("./cert/client/" + user
+						+ "/clienttruststore"), password); // truststore
 				// password
 				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
@@ -64,7 +62,7 @@ public class Client {
 				System.out.println("Wrong password and/or username!");
 				System.exit(0);
 			}
-			
+
 			SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
 			System.out.println("\nsocket before handshake:\n" + socket + "\n");
 
@@ -75,7 +73,7 @@ public class Client {
 			 * a forced handshake here when using PrintWriters.
 			 */
 			socket.startHandshake();
-//			System.out.println("hejhej");
+			// System.out.println("hejhej");
 			SSLSession session = socket.getSession();
 			X509Certificate cert = (X509Certificate) session
 					.getPeerCertificateChain()[0];
@@ -85,15 +83,16 @@ public class Client {
 							+ subject + "\n");
 			System.out.println("socket after handshake:\n" + socket + "\n");
 			System.out.println("secure connection established\n\n");
-			
+
 			BufferedReader read = new BufferedReader(new InputStreamReader(
 					System.in));
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
-//			System.out.println("penis");
+			// System.out.println("penis");
 			String input;
 			while (true) {
+				System.out.println("Vit vann!");
 				input = read.readLine();
 				if (input.equalsIgnoreCase("exit"))
 					break;
