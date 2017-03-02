@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.FileWriter;
 
 import javax.net.*;
@@ -14,15 +15,14 @@ import users.*;
 
 public class Server implements Runnable {
 	private static ArrayList<String> Patients;
-	private static ArrayList<String> Nurses;
-	private static ArrayList<String> Doctors;
+	private static HashMap<String, String[]> journals;
 	private static ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
 
 	public Server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
 		newListener();
-//		FileWriter writer = new FileWriter("./Datasäkerhet/Logger");
+		// FileWriter writer = new FileWriter("./Datasäkerhet/Logger");
 
 	}
 
@@ -121,14 +121,14 @@ public class Server implements Runnable {
 			if (!(currentUser instanceof Doctor))
 				return "Unauthorized.";
 			else
-				return addPatient();
+				return addPatient(in, out, currentUser);
 		case "remove":
 			if (!(currentUser instanceof Agent))
 				return "Unauthorized";
 			else
-				return removePatient();
+				return removePatient(in, out, currentUser);
 		case "read":
-			return readJournal();
+			return readJournal(in, out, currentUser);
 		case "edit":
 			if (!((currentUser instanceof Caretaker)))
 				return "Unauthorized";
@@ -146,20 +146,25 @@ public class Server implements Runnable {
 		return null;
 	}
 
-	private String readJournal() {
+	private String readJournal(BufferedReader in, PrintWriter out,
+			User currentUser) throws Exception {
+		String patient = sendRequest(
+				"Please enter patients social security nmbr", in, out);
+
+		return null;
+	}
+
+	private String removePatient(BufferedReader in, PrintWriter out,
+			User currentUser) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private String removePatient() {
-		// TODO Auto-generated method stub
+	private String addPatient(BufferedReader in, PrintWriter out,
+			User currentUser) {
 		return null;
-	}
+		// TODO Auto-generated method stub
 
-	private String addPatient() {
-		return null;
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void newListener() {
@@ -205,7 +210,7 @@ public class Server implements Runnable {
 	}
 
 	private void audit(String content) {
-//		writer.
+		// writer.
 	}
 
 	private static ServerSocketFactory getServerSocketFactory(String type) {
