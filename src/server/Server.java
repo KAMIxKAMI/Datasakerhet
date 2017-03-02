@@ -191,10 +191,6 @@ public class Server implements Runnable {
 	private static void fill() {
 		Patients.add("940409-7116");
 		Patients.add("340819-3984");
-		Doctors.add("870630-4014");
-		Doctors.add("950417-6584");
-		Nurses.add("940419-1234");
-		Nurses.add("940228-0375");
 	}
 
 	private String sendRequest(String request, BufferedReader in,
