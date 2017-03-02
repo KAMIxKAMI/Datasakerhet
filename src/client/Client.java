@@ -73,7 +73,6 @@ public class Client {
 			 * a forced handshake here when using PrintWriters.
 			 */
 			socket.startHandshake();
-			// System.out.println("hejhej");
 			SSLSession session = socket.getSession();
 			X509Certificate cert = (X509Certificate) session
 					.getPeerCertificateChain()[0];
@@ -89,10 +88,8 @@ public class Client {
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
-			// System.out.println("penis");
 			String input;
 			while (true) {
-				System.out.println("Vit vann!");
 				input = read.readLine();
 				if (input.equalsIgnoreCase("exit"))
 					break;

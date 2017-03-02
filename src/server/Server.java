@@ -70,12 +70,12 @@ public class Server implements Runnable {
 				break;
 			}
 
-			if (currentUser != null) {
+			if ((currentUser != null) || true) {
 				out.println("Authenticated");
 				out.flush();
 				// fix commands
-				System.err.println("Röd vann");
-				while ((clientMsg = in.readLine()) != null) {
+
+				do {
 					String reply = executeCommand(
 							sendRequest("Enter a command: ", in, out), in, out,
 							currentUser);
@@ -84,7 +84,7 @@ public class Server implements Runnable {
 					// System.out.print("sending '" + rev + "' to client...");
 					out.println(reply);
 					out.flush();
-				}
+				} while ((clientMsg = in.readLine()) != null);
 			} else {
 				out.println("Bad Credentials. Closing connection ..");
 				out.flush();
@@ -192,10 +192,9 @@ public class Server implements Runnable {
 				KeyStore ts = KeyStore.getInstance("JKS");
 				char[] password = "password".toCharArray();
 				ks.load(new FileInputStream(
-						"./cert/server/Server/serverkeystore"),
-						password); // keystore
-				ts.load(new FileInputStream("./cert/server/Server/servertruststore"),
-						password);
+						"./cert/server/Server/serverkeystore"), password); // keystore
+				ts.load(new FileInputStream(
+						"./cert/server/Server/servertruststore"), password);
 				// password
 				// (storepass)
 				// password
