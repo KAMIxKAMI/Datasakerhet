@@ -19,12 +19,13 @@ import javax.swing.JOptionPane;
 
 public class Client {
 	HashMap<String, String> accounts;
+	private char[] user;
 
 	public void init() throws Exception {
 		BufferedReader sysin = new BufferedReader(new InputStreamReader(
 				System.in));
 		String host = "localhost";
-		int port = 1177;
+		int port = 1994;
 
 		try { /* set up a key manager for client authentication */
 			SSLSocketFactory factory = null;
@@ -42,11 +43,12 @@ public class Client {
 						.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
 
-				ks.load(new FileInputStream("./cert/client/" + user
-						+ "/clientkeystore"), password); // keystore);
+				ks.load(new FileInputStream("./cert/client/" + user), password); // keystore);
 				// password
 				// (storepass)
-				ts.load(new FileInputStream("./cert/client/clienttruststore"), password); // truststore
+				ts.load(new FileInputStream("./cert/client/clienttruststore"),
+						password);
+				// truststore
 				// password
 				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
@@ -88,10 +90,12 @@ public class Client {
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
 			String input;
+			System.out.println(in.readLine() + "\n" + in.readLine());
 			while (true) {
 				input = read.readLine();
 				if (input.equalsIgnoreCase("exit"))
 					break;
+				out.println(input);
 				out.println(input);
 				out.flush();
 				System.out.println(in.readLine());

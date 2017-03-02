@@ -3,6 +3,7 @@ package server;
 import java.io.*;
 import java.net.*;
 import java.security.KeyStore;
+import java.util.ArrayList;
 
 import javax.net.*;
 import javax.net.ssl.*;
@@ -11,7 +12,10 @@ import javax.security.cert.X509Certificate;
 import users.*;
 
 public class Server implements Runnable {
-	private ServerSocket serverSocket = null;
+	private static ArrayList<String> Patients;
+	private static ArrayList<String> Nurses;
+	private static ArrayList<String> Doctors;
+	private static ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
 
 	public Server(ServerSocket ss) throws IOException {
@@ -69,10 +73,10 @@ public class Server implements Runnable {
 				currentUser = new Agent(info[0]);
 				break;
 			}
+			out.println("Authenticated");
+			out.flush();
 
 			if ((currentUser != null) || true) {
-				out.println("Authenticated");
-				out.flush();
 				// fix commands
 
 				do {
@@ -110,40 +114,28 @@ public class Server implements Runnable {
 			PrintWriter out, User currentUser) throws Exception {
 		switch (command.toLowerCase()) {
 		case "help":
-			return executeCommand(
-					sendRequest(
-							"The commands are: help, add, remove, read, edit. Please try again: ",
-							in, out), in, out, currentUser);
+			return "The commands are: help, add, remove, read, edit. Please try again: ";
 		case "add":
 			if (!(currentUser instanceof Doctor))
-				return executeCommand(
-						sendRequest("Unauthorized. Try another command.", in,
-								out), in, out, currentUser);
+				return "Unauthorized.";
 			else
-				return "new patient added";
+				return "New patient added.";
 		case "remove":
 			if (!(currentUser instanceof Agent))
-				return executeCommand(
-						sendRequest("Unauthorized. Try another command.", in,
-								out), in, out, currentUser);
+				return "Unauthorized";
 			else
 				return "patient removed";
 		case "read":
 			return "detta är inte alls placeholder kod";
 		case "edit":
 			if (!((currentUser instanceof Caretaker)))
-				return executeCommand(
-						sendRequest("Unauthorized. Try another command.", in,
-								out), in, out, currentUser);
+				return "Unauthorized";
 			else {
 				return "Checken för division vill inte som jag vill.";
 			}
 
 		default:
-			return executeCommand(
-					sendRequest(
-							"No valid command entered, please try again or type help.",
-							in, out), in, out, currentUser);
+			return "No valid command entered, please try again!";
 		}
 	}
 
@@ -153,7 +145,8 @@ public class Server implements Runnable {
 
 	public static void main(String args[]) {
 		System.out.println("\nServer Started\n");
-		int port = 1177;
+		// fill();
+		int port = 1994;
 		String type = "TLS";
 		try {
 			ServerSocketFactory ssf = getServerSocketFactory(type);
@@ -165,6 +158,15 @@ public class Server implements Runnable {
 			System.out.println("Unable to start Server: " + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	private static void fill() {
+		Patients.add("940409-7116");
+		Patients.add("340819-3984");
+		Doctors.add("870630-4014");
+		Doctors.add("950417-6584");
+		Nurses.add("940419-1234");
+		Nurses.add("940228-0375");
 	}
 
 	private String sendRequest(String request, BufferedReader in,
