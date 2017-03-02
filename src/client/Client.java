@@ -43,12 +43,12 @@ public class Client {
 				SSLContext ctx = SSLContext.getInstance("TLS");
 
 				ks.load(new FileInputStream(
-						"/Users/axelisberg/Documents/Programmering/ptdc-workspace/Datasäkerhet/cert/client/"
+						"./cert/client/"
 								+ user + "/clientkeystore"), password); // keystore);
 				// password
 				// (storepass)
 				ts.load(new FileInputStream(
-						"/Users/axelisberg/Documents/Programmering/ptdc-workspace/Datasäkerhet/cert/client/"
+						"./cert/client/"
 								+ user + "/clienttruststore"), password); // truststore
 				// password
 				// (storepass);
