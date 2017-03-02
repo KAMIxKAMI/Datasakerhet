@@ -14,19 +14,28 @@ import javax.security.cert.X509Certificate;
 import users.*;
 
 public class Server implements Runnable {
-	private static ArrayList<String> Patients, patient1, patient2;
+	private static ArrayList<ArrayList> section1, section2;
+	private static ArrayList<String> patient1, patient2;
 	private static HashMap<String, ArrayList<String>> patientJournals;
+	private static HashMap<String, ArrayList<ArrayList>> division;
+	private static ArrayList<String> journal;
 	private static ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
-	private static PrintWriter writer;
+	private static BufferedWriter writer;
 
 	public Server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
 		newListener();
 		patient1 = new ArrayList();
 		patient2 = new ArrayList();
+		section1 = new ArrayList();
+		section2 = new ArrayList();
+		journal = new ArrayList();
+
 		patientJournals = new HashMap();
-		writer = new PrintWriter("Logger", "UTF-8");
+		division = new HashMap();
+		writer = new BufferedWriter(new PrintWriter("Logger", "UTF-8"));
+
 		fill();
 		// FileWriter writer = new FileWriter("./Datasäkerhet/Logger");
 	}
@@ -83,8 +92,7 @@ public class Server implements Runnable {
 
 			out.println("Authenticated");
 			out.flush();
-
-			if ((currentUser != null) || true) {
+			if ((currentUser != null)) {
 				// fix commands
 
 				do {
@@ -97,7 +105,7 @@ public class Server implements Runnable {
 					// System.out.print("sending '" + rev + "' to client...");
 					out.println(reply);
 					out.flush();
-				} while ((clientMsg = in.readLine()) != null);
+				} while (true);
 			} else {
 				out.println("Bad Credentials. Closing connection ..");
 				out.flush();
@@ -122,6 +130,7 @@ public class Server implements Runnable {
 
 	private String executeCommand(String command, BufferedReader in,
 			PrintWriter out, User currentUser) throws Exception {
+		// command ="";
 		logg(command);
 		switch (command.toLowerCase()) {
 		case "help":
@@ -135,14 +144,14 @@ public class Server implements Runnable {
 			if (!(currentUser instanceof Agent))
 				return "Unauthorized";
 			else
-				return removePatient(in, out, currentUser);
+				return removeEntry(in, out, currentUser);
 		case "read":
 			return readJournal(in, out, currentUser);
 		case "edit":
 			if (!((currentUser instanceof Caretaker)))
 				return "Unauthorized";
 			else {
-				return editJournal();
+				return editJournal(in, out, currentUser);
 			}
 
 		default:
@@ -150,8 +159,23 @@ public class Server implements Runnable {
 		}
 	}
 
-	private String editJournal() {
-		return null;
+	private String editJournal(BufferedReader in, PrintWriter out,
+			User currentUser) throws Exception {
+
+		String entryString = sendRequest(
+				"Enter patients social security number, journalentry no., and the edit. Seperate with /: ",
+				in, out);
+		String[] split = entryString.split("/", 3);
+		System.out.println(split[0]);
+		out.flush();
+
+		journal = patientJournals.get(split[0]);
+		journal.add(Integer.parseInt(split[1]),
+				journal.get(Integer.parseInt(split[1])) + "\n" + split[2]);
+		// int entry = Integer.parseInt(sendRequest(
+		// "Which entry do you want to remove?", in, out));
+
+		return journal.get(Integer.parseInt(split[1]));
 	}
 
 	private String readJournal(BufferedReader in, PrintWriter out,
@@ -159,21 +183,36 @@ public class Server implements Runnable {
 		String entry = "";
 		if (currentUser instanceof Caretaker) {
 
+			ArrayList<ArrayList> tempDivision = division
+					.get(((Caretaker) currentUser).getDivision());
+
+			for (ArrayList<String> i : tempDivision) {
+				for (String j : i) {
+					entry = entry + "\n ----------- \n" + j;
+					logg(currentUser.getName() + " has accessed " + entry);
+				}
+				return entry;
+			}
 		} else {
 			ArrayList<String> journal = patientJournals.get(currentUser
 					.getPNbr());
 			for (String s : journal) {
-				entry = entry + "\n ----------- \n" + s;
-				logg(currentUser.getName()+" has accessed "+entry);
+				entry = entry + "\n ----------- \n" + s + "\n ----------- \n";
+				logg(currentUser.getName() + " has accessed " + entry);
 			}
 		}
 		return entry;
 	}
 
-	private String removePatient(BufferedReader in, PrintWriter out,
-			User currentUser) {
-		// TODO Auto-generated method stub
-		return null;
+	private String removeEntry(BufferedReader in, PrintWriter out,
+			User currentUser) throws Exception {
+
+		String removalEntry = sendRequest(
+				"Enter patients social security number and which entry, seperate with /: ",
+				in, out);
+		String[] split = removalEntry.split("/");
+		journal = patientJournals.get(split[0]);
+		return journal.remove(split[1]) + " was removed.";
 	}
 
 	private String addPatient(BufferedReader in, PrintWriter out,
@@ -190,8 +229,11 @@ public class Server implements Runnable {
 		patient1.add("Entry 2: Patient suspects he is a chihuauhua");
 		patient2.add("Everything is fine, nothing to see here");
 		patientJournals.put("940409-7116", patient1);
-		patientJournals.put("", patient2);
-
+		patientJournals.put("340819-3984", patient2);
+		section1.add(patient1);
+		section2.add(patient2);
+		division.put("1", section1);
+		division.put("2", section2);
 	}
 
 	private String sendRequest(String request, BufferedReader in,
@@ -244,9 +286,11 @@ public class Server implements Runnable {
 		return null;
 	}
 
-	public void logg(String in) {
-		writer.println(in);
-		
+	public void logg(String in) throws IOException {
+		writer.write(in, 0, in.length());
+		writer.write("\n");
+		writer.flush();
+
 	}
 
 	public static void main(String args[]) {

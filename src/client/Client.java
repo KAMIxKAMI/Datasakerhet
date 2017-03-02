@@ -94,6 +94,7 @@ public class Client {
 			System.out.println(in.readLine() + "\n" + in.readLine());
 			while (true) {
 				input = read.readLine();
+				if(input.equals(null)) out.println("No command");
 				if (input.equalsIgnoreCase("exit"))
 					break;
 				out.println(input);
