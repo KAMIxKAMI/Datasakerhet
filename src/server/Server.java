@@ -110,8 +110,9 @@ public class Server implements Runnable {
 		switch (command.toLowerCase()) {
 		case "help":
 			return executeCommand(
-					sendRequest("The commands are: help, add, remove, read, edit. Please try again: ", in,
-							out), in, out, currentUser);
+					sendRequest(
+							"The commands are: help, add, remove, read, edit. Please try again: ",
+							in, out), in, out, currentUser);
 		case "add":
 			if (!(currentUser instanceof Doctor))
 				return executeCommand(
@@ -189,12 +190,14 @@ public class Server implements Runnable {
 				KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
 				char[] password = "password".toCharArray();
-
-				ks.load(new FileInputStream("/Users/axelisberg/Documents/Programmering/ptdc-workspace/Datasäkerhet/cert/server/Server/serverkeystore"), password); // keystore
-																			// password
-																			// (storepass)
-																			// password
-																			// (storepass)
+				String filePath = "./cert/server/Server/serverkeystore";
+				ks.load(new FileInputStream(
+						filePath),
+						password); // keystore
+				// password
+				// (storepass)
+				// password
+				// (storepass)
 				kmf.init(ks, password); // certificate password (keypass)
 				tmf.init(ts); // possible to use keystore as truststore here
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
