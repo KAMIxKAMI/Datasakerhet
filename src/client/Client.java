@@ -47,8 +47,8 @@ public class Client {
 				// password
 				// (storepass)
 				ts.load(new FileInputStream("./cert/client/clienttruststore"),
-						password);
-				// truststore
+						password); // truststore
+
 				// password
 				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
@@ -74,6 +74,7 @@ public class Client {
 			 * a forced handshake here when using PrintWriters.
 			 */
 			socket.startHandshake();
+			// System.out.println("hejhej");
 			SSLSession session = socket.getSession();
 			X509Certificate cert = (X509Certificate) session
 					.getPeerCertificateChain()[0];
@@ -89,6 +90,7 @@ public class Client {
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
+			// System.out.println("penis");
 			String input;
 			System.out.println(in.readLine() + "\n" + in.readLine());
 			while (true) {
