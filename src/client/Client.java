@@ -46,8 +46,7 @@ public class Client {
 						+ "/clientkeystore"), password); // keystore);
 				// password
 				// (storepass)
-				ts.load(new FileInputStream("./cert/client/" + user
-						+ "/clienttruststore"), password); // truststore
+				ts.load(new FileInputStream("./cert/client/clienttruststore"), password); // truststore
 				// password
 				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
