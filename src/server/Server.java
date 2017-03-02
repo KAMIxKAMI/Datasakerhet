@@ -14,16 +14,21 @@ import javax.security.cert.X509Certificate;
 import users.*;
 
 public class Server implements Runnable {
-	private static ArrayList<String> Patients;
-	private static HashMap<String, String[]> journals;
+	private static ArrayList<String> Patients, patient1, patient2;
+	private static HashMap<String, ArrayList<String>> patientJournals;
 	private static ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
+	private static PrintWriter writer;
 
 	public Server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
 		newListener();
+		patient1 = new ArrayList();
+		patient2 = new ArrayList();
+		patientJournals = new HashMap();
+		writer = new PrintWriter("Logger", "UTF-8");
+		fill();
 		// FileWriter writer = new FileWriter("./Datasäkerhet/Logger");
-
 	}
 
 	public void run() {
@@ -75,6 +80,7 @@ public class Server implements Runnable {
 				currentUser = new Agent(info[0]);
 				break;
 			}
+
 			out.println("Authenticated");
 			out.flush();
 
@@ -85,6 +91,7 @@ public class Server implements Runnable {
 					String reply = executeCommand(
 							sendRequest("Enter a command: ", in, out), in, out,
 							currentUser);
+					logg(reply);
 					// System.out.println("received '" + clientMsg +
 					// "' from client");
 					// System.out.print("sending '" + rev + "' to client...");
@@ -98,6 +105,7 @@ public class Server implements Runnable {
 			in.close();
 			out.close();
 			socket.close();
+			writer.close();
 			numConnectedClients--;
 			System.out.println("client disconnected");
 			System.out.println(numConnectedClients
@@ -114,6 +122,7 @@ public class Server implements Runnable {
 
 	private String executeCommand(String command, BufferedReader in,
 			PrintWriter out, User currentUser) throws Exception {
+		logg(command);
 		switch (command.toLowerCase()) {
 		case "help":
 			return "The commands are: help, add, remove, read, edit. Please try again: ";
@@ -142,16 +151,23 @@ public class Server implements Runnable {
 	}
 
 	private String editJournal() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	private String readJournal(BufferedReader in, PrintWriter out,
 			User currentUser) throws Exception {
-		String patient = sendRequest(
-				"Please enter patients social security nmbr", in, out);
+		String entry = "";
+		if (currentUser instanceof Caretaker) {
 
-		return null;
+		} else {
+			ArrayList<String> journal = patientJournals.get(currentUser
+					.getPNbr());
+			for (String s : journal) {
+				entry = entry + "\n ----------- \n" + s;
+				logg(currentUser.getName()+" has accessed "+entry);
+			}
+		}
+		return entry;
 	}
 
 	private String removePatient(BufferedReader in, PrintWriter out,
@@ -163,34 +179,19 @@ public class Server implements Runnable {
 	private String addPatient(BufferedReader in, PrintWriter out,
 			User currentUser) {
 		return null;
-		// TODO Auto-generated method stub
-
 	}
 
 	private void newListener() {
 		(new Thread(this)).start();
 	} // calls run()
 
-	public static void main(String args[]) {
-		System.out.println("\nServer Started\n");
-		// fill();
-		int port = 1994;
-		String type = "TLS";
-		try {
-			ServerSocketFactory ssf = getServerSocketFactory(type);
-			ServerSocket ss = ssf.createServerSocket(port);
-			((SSLServerSocket) ss).setNeedClientAuth(true); // enables client
-															// authentication
-			new Server(ss);
-		} catch (IOException e) {
-			System.out.println("Unable to start Server: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
-
 	private static void fill() {
-		Patients.add("940409-7116");
-		Patients.add("340819-3984");
+		patient1.add("Entry 1: Patient is cray-cray");
+		patient1.add("Entry 2: Patient suspects he is a chihuauhua");
+		patient2.add("Everything is fine, nothing to see here");
+		patientJournals.put("940409-7116", patient1);
+		patientJournals.put("", patient2);
+
 	}
 
 	private String sendRequest(String request, BufferedReader in,
@@ -241,5 +242,27 @@ public class Server implements Runnable {
 			return ServerSocketFactory.getDefault();
 		}
 		return null;
+	}
+
+	public void logg(String in) {
+		writer.println(in);
+		
+	}
+
+	public static void main(String args[]) {
+		System.out.println("\nServer Started\n");
+		// fill();
+		int port = 1994;
+		String type = "TLS";
+		try {
+			ServerSocketFactory ssf = getServerSocketFactory(type);
+			ServerSocket ss = ssf.createServerSocket(port);
+			((SSLServerSocket) ss).setNeedClientAuth(true); // enables client
+			// authentication
+			new Server(ss);
+		} catch (IOException e) {
+			System.out.println("Unable to start Server: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }
