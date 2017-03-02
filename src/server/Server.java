@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.io.FileWriter;
 
 import javax.net.*;
 import javax.net.ssl.*;
@@ -21,6 +22,7 @@ public class Server implements Runnable {
 	public Server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
 		newListener();
+//		FileWriter writer = new FileWriter("./Datasäkerhet/Logger");
 
 	}
 
@@ -119,24 +121,45 @@ public class Server implements Runnable {
 			if (!(currentUser instanceof Doctor))
 				return "Unauthorized.";
 			else
-				return "New patient added.";
+				return addPatient();
 		case "remove":
 			if (!(currentUser instanceof Agent))
 				return "Unauthorized";
 			else
-				return "patient removed";
+				return removePatient();
 		case "read":
-			return "detta är inte alls placeholder kod";
+			return readJournal();
 		case "edit":
 			if (!((currentUser instanceof Caretaker)))
 				return "Unauthorized";
 			else {
-				return "Checken för division vill inte som jag vill.";
+				return editJournal();
 			}
 
 		default:
 			return "No valid command entered, please try again!";
 		}
+	}
+
+	private String editJournal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String readJournal() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String removePatient() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String addPatient() {
+		return null;
+		// TODO Auto-generated method stub
+		
 	}
 
 	private void newListener() {
@@ -179,6 +202,10 @@ public class Server implements Runnable {
 			throw new Exception("Client timed-out");
 		System.out.println("Recieved answer: " + clientAns);
 		return clientAns;
+	}
+
+	private void audit(String content) {
+//		writer.
 	}
 
 	private static ServerSocketFactory getServerSocketFactory(String type) {

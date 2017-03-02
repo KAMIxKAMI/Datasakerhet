@@ -42,13 +42,12 @@ public class Client {
 				TrustManagerFactory tmf = TrustManagerFactory
 						.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
-
-				ks.load(new FileInputStream("./cert/client/" + user), password); // keystore);
+				ks.load(new FileInputStream("./cert/client/" + user+ "keystore"), password); // keystore);
 				// password
 				// (storepass)
 				ts.load(new FileInputStream("./cert/client/clienttruststore"),
-						password); // truststore
-
+						password);
+				// truststore
 				// password
 				// (storepass);
 				kmf.init(ks, password); // user password (keypass)
