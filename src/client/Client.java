@@ -3,6 +3,7 @@ package client;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.security.KeyStore;
@@ -20,6 +21,7 @@ import javax.swing.JOptionPane;
 public class Client {
 	HashMap<String, String> accounts;
 	private char[] user;
+	BufferedReader in;
 
 	public void init() throws Exception {
 		BufferedReader sysin = new BufferedReader(new InputStreamReader(
@@ -42,7 +44,8 @@ public class Client {
 				TrustManagerFactory tmf = TrustManagerFactory
 						.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
-				ks.load(new FileInputStream("./cert/client/" + user+ "keystore"), password); // keystore);
+				ks.load(new FileInputStream("./cert/client/" + user
+						+ "keystore"), password); // keystore);
 				// password
 				// (storepass)
 				ts.load(new FileInputStream("./cert/client/clienttruststore"),
@@ -87,20 +90,20 @@ public class Client {
 			BufferedReader read = new BufferedReader(new InputStreamReader(
 					System.in));
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(
+			in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
 			// System.out.println("penis");
 			String input;
 			System.out.println(in.readLine() + "\n" + in.readLine());
 			while (true) {
 				input = read.readLine();
-				if(input.equals(null)) out.println("No command");
+				if (input.equals(null)||input.isEmpty())
+					out.println("No command");
 				if (input.equalsIgnoreCase("exit"))
 					break;
 				out.println(input);
-				out.println(input);
 				out.flush();
-				System.out.println(in.readLine());
+				System.out.println(readFromServer());
 
 			}
 
@@ -111,6 +114,16 @@ public class Client {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String readFromServer() throws IOException {
+		StringBuilder sb = new StringBuilder();
+		
+		//while (in.ready()) {
+			//sb.append("hurrdurr");
+			sb.append(in.readLine() + "\n");
+		//}
+		return sb.toString();
 	}
 
 }

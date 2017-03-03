@@ -103,6 +103,7 @@ public class Server implements Runnable {
 					// System.out.println("received '" + clientMsg +
 					// "' from client");
 					// System.out.print("sending '" + rev + "' to client...");
+					System.out.println(reply);
 					out.println(reply);
 					out.flush();
 				} while (true);
