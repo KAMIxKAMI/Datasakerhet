@@ -97,8 +97,9 @@ public class Client {
 			System.out.println(readFromServer());
 			while (true) {
 				input = read.readLine();
-				if (input.equals(null) || input.isEmpty()) {
-					System.out.println("No command found, try again: ");
+
+				if (input.equals(null) || input.isEmpty() || input.equals("")) {
+					out.println("No command, try again\n");
 					continue;
 				}
 				if (input.equalsIgnoreCase("exit"))
@@ -120,15 +121,21 @@ public class Client {
 
 	public String readFromServer() throws IOException {
 		StringBuilder sb = new StringBuilder();
-		sb.append(in.readLine() + "\n");
-		while (in.ready()) {
 
-			sb.append(in.readLine() + "\n");
+		String ans = in.readLine();
+		sb.append(ans);
+		while (in.ready()) {
+			// sb.append("hurrdurr");
+			// System.out.println("keeps reading lines :" + ans);//
+			ans = in.readLine();
+			sb.append(ans + "\n");
+			System.out.println("In the while loop, ans is: " + ans + "\n");
 		}
+		System.out.println("\n\nleft the while loop");
+		System.out.println(sb.toString());
 		return sb.toString();
 		// System.out.println("Shit happens");
 		// sb.append("hurrdurr");
 		// for (int i = 0; i < 10; i++)
 	}
-
 }
