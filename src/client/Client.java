@@ -94,11 +94,13 @@ public class Client {
 					socket.getInputStream()));
 			// System.out.println("penis");
 			String input;
-			System.out.println(in.readLine() + "\n" + in.readLine());
+			System.out.println(readFromServer());
 			while (true) {
 				input = read.readLine();
-				if (input.equals(null)||input.isEmpty())
-					out.println("No command");
+				if (input.equals(null) || input.isEmpty()) {
+					System.out.println("No command found, try again: ");
+					continue;
+				}
 				if (input.equalsIgnoreCase("exit"))
 					break;
 				out.println(input);
@@ -118,12 +120,15 @@ public class Client {
 
 	public String readFromServer() throws IOException {
 		StringBuilder sb = new StringBuilder();
-		
-		//while (in.ready()) {
-			//sb.append("hurrdurr");
+		sb.append(in.readLine() + "\n");
+		while (in.ready()) {
+
 			sb.append(in.readLine() + "\n");
-		//}
+		}
 		return sb.toString();
+		// System.out.println("Shit happens");
+		// sb.append("hurrdurr");
+		// for (int i = 0; i < 10; i++)
 	}
 
 }

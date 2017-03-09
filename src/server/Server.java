@@ -5,7 +5,6 @@ import java.net.*;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.io.FileWriter;
 
 import javax.net.*;
 import javax.net.ssl.*;
@@ -13,6 +12,7 @@ import javax.security.cert.X509Certificate;
 
 import users.*;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class Server implements Runnable {
 	private static ArrayList<ArrayList> section1, section2;
 	private static ArrayList<String> patient1, patient2;
@@ -90,13 +90,13 @@ public class Server implements Runnable {
 				break;
 			}
 
-			out.println("Authenticated");
+			out.println("Authenticated \nEnter a command: ");
 			out.flush();
 			if ((currentUser != null)) {
 				// fix commands
-
+				String reply = "";
 				do {
-					String reply = executeCommand(
+					reply = executeCommand(
 							sendRequest("Enter a command: ", in, out), in, out,
 							currentUser);
 					logg(reply);
@@ -104,9 +104,9 @@ public class Server implements Runnable {
 					// "' from client");
 					// System.out.print("sending '" + rev + "' to client...");
 					System.out.println(reply);
-					out.println(reply);
+					out.println(reply + "\nEnter a command: ");
 					out.flush();
-				} while (true);
+				} while (!reply.equalsIgnoreCase(""));
 			} else {
 				out.println("Bad Credentials. Closing connection ..");
 				out.flush();
@@ -168,7 +168,7 @@ public class Server implements Runnable {
 				in, out);
 		String[] split = entryString.split("/", 3);
 		System.out.println(split[0]);
-		out.flush();
+//		out.flush();
 
 		journal = patientJournals.get(split[0]);
 		journal.add(Integer.parseInt(split[1]),
@@ -181,7 +181,8 @@ public class Server implements Runnable {
 
 	private String readJournal(BufferedReader in, PrintWriter out,
 			User currentUser) throws Exception {
-		String entry = "";
+		StringBuilder entry = new StringBuilder("");
+
 		if (currentUser instanceof Caretaker) {
 
 			ArrayList<ArrayList> tempDivision = division
@@ -189,20 +190,20 @@ public class Server implements Runnable {
 
 			for (ArrayList<String> i : tempDivision) {
 				for (String j : i) {
-					entry = entry + "\n ----------- \n" + j;
+					entry.append("\n-----------\n" + j + "\n-----------\n");
 					logg(currentUser.getName() + " has accessed " + entry);
 				}
-				return entry;
+				return entry.toString();
 			}
 		} else {
 			ArrayList<String> journal = patientJournals.get(currentUser
 					.getPNbr());
 			for (String s : journal) {
-				entry = entry + "\n ----------- \n" + s + "\n ----------- \n";
+				entry.append("----------- \n" + s + "\n-----------\n");
 				logg(currentUser.getName() + " has accessed " + entry);
 			}
 		}
-		return entry;
+		return entry.toString();
 	}
 
 	private String removeEntry(BufferedReader in, PrintWriter out,
@@ -240,17 +241,11 @@ public class Server implements Runnable {
 	private String sendRequest(String request, BufferedReader in,
 			PrintWriter out) throws Exception {
 		System.out.print("sending '" + request + "' to client...");
-		out.println(request);
-		out.flush();
 		String clientAns = in.readLine();
 		if (clientAns == null)
 			throw new Exception("Client timed-out");
 		System.out.println("Recieved answer: " + clientAns);
 		return clientAns;
-	}
-
-	private void audit(String content) {
-		// writer.
 	}
 
 	private static ServerSocketFactory getServerSocketFactory(String type) {
