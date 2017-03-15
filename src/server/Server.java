@@ -70,10 +70,10 @@ public class Server implements Runnable {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(
 					socket.getInputStream()));
-			String clientMsg = null;
+			// String clientMsg = null;
 
 			// password implementation
-			String[] CNAndName = subject.split("=");
+			// String[] CNAndName = subject.split("=");
 			User currentUser = null;
 			switch (info[2].toString()) {
 			case "Doctor":
@@ -85,12 +85,12 @@ public class Server implements Runnable {
 			case "Patient":
 				currentUser = new Patient(info[3], info[0]);
 				break;
-			case "Government":
+			case "Agent":
 				currentUser = new Agent(info[0]);
 				break;
 			}
 
-			out.println("Authenticated \nEnter a command: ");
+			out.println("Authenticated Enter a command: ");
 			out.flush();
 			if ((currentUser != null)) {
 				// fix commands
@@ -162,13 +162,12 @@ public class Server implements Runnable {
 
 	private String editJournal(BufferedReader in, PrintWriter out,
 			User currentUser) throws Exception {
-
 		String entryString = sendRequest(
 				"Enter patients social security number, journalentry no., and the edit. Seperate with /: ",
 				in, out);
 		String[] split = entryString.split("/", 3);
 		System.out.println(split[0]);
-//		out.flush();
+		// out.flush();
 
 		journal = patientJournals.get(split[0]);
 		journal.add(Integer.parseInt(split[1]),

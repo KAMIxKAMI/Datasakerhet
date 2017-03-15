@@ -129,10 +129,10 @@ public class Client {
 			// System.out.println("keeps reading lines :" + ans);//
 			ans = in.readLine();
 			sb.append(ans + "\n");
-			System.out.println("In the while loop, ans is: " + ans + "\n");
+			// System.out.println("In the while loop, ans is: " + ans + "\n");
 		}
-		System.out.println("\n\nleft the while loop");
-		System.out.println(sb.toString());
+		// System.out.println("\n\nleft the while loop");
+		// System.out.println(sb.toString());
 		return sb.toString();
 		// System.out.println("Shit happens");
 		// sb.append("hurrdurr");
