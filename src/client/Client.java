@@ -95,6 +95,7 @@ public class Client {
 			// System.out.println("penis");
 			String input;
 			System.out.println(readFromServer());
+			String lastinput = "";
 			while (true) {
 				input = read.readLine();
 
@@ -102,10 +103,27 @@ public class Client {
 					out.println("No command, try again\n");
 					continue;
 				}
+				switch (input.toLowerCase()) {
+				case "exit":
+					break;
+				case "remove":
+					System.out
+							.println("Enter patients social security number and which entry, seperate with /: ");
+					input = input + "/" + read.readLine();
+					break;
+				case "edit":
+					System.out
+							.println("Enter patients social security number and the new journal entry. Separate with /: ");
+					input = input + "/" + read.readLine();
+					break;
+				case "add":
+					break;
+				}
+
 				if (input.equalsIgnoreCase("exit"))
 					break;
-				out.println(input);
-				out.flush();
+				lastinput = input.toLowerCase();
+				sendToServer(input, out);
 				System.out.println(readFromServer());
 
 			}
@@ -117,6 +135,11 @@ public class Client {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void sendToServer(String message, PrintWriter out) {
+		out.println(message);
+		out.flush();
 	}
 
 	public String readFromServer() throws IOException {

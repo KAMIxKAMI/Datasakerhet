@@ -14,7 +14,7 @@ public class demorun {
 		try {
 			Client client = new Client();
 			String[] port = new String[1];
-			Server.main(port);
+
 			client.init();
 		} catch (IOException e) {
 			System.err.println("Shit hit the fan");

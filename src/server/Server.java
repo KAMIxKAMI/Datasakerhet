@@ -14,14 +14,15 @@ import users.*;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class Server implements Runnable {
-	private static ArrayList<ArrayList> section1, section2;
-	private static ArrayList<String> patient1, patient2;
-	private static HashMap<String, ArrayList<String>> patientJournals;
-	private static HashMap<String, ArrayList<ArrayList>> division;
-	private static ArrayList<String> journal;
-	private static ServerSocket serverSocket = null;
-	private static int numConnectedClients = 0;
-	private static BufferedWriter writer;
+	private ArrayList<ArrayList> section1, section2;
+	private ArrayList<String> patient1, patient2;
+	private HashMap<String, ArrayList<String>> patientJournals;
+	private HashMap<String, ArrayList<ArrayList>> division;
+	private ArrayList<String> journal;
+	private ServerSocket serverSocket = null;
+	private int numConnectedClients = 0;
+	private BufferedWriter writer;
+	private String[] split;
 
 	public Server(ServerSocket ss) throws IOException {
 		serverSocket = ss;
@@ -42,6 +43,7 @@ public class Server implements Runnable {
 
 	public void run() {
 		try {
+
 			SSLSocket socket = (SSLSocket) serverSocket.accept();
 			newListener();
 			SSLSession session = socket.getSession();
@@ -133,49 +135,53 @@ public class Server implements Runnable {
 			PrintWriter out, User currentUser) throws Exception {
 		// command ="";
 		logg(command);
-		switch (command.toLowerCase()) {
-		case "help":
-			return "The commands are: help, add, remove, read, edit. Please try again: ";
-		case "add":
-			if (!(currentUser instanceof Doctor))
-				return "Unauthorized.";
-			else
-				return addPatient(in, out, currentUser);
-		case "remove":
-			if (!(currentUser instanceof Agent))
-				return "Unauthorized";
-			else
-				return removeEntry(in, out, currentUser);
-		case "read":
-			return readJournal(in, out, currentUser);
-		case "edit":
-			if (!((currentUser instanceof Caretaker)))
-				return "Unauthorized";
-			else {
-				return editJournal(in, out, currentUser);
-			}
-
-		default:
+		if (command.equals(null))
 			return "No valid command entered, please try again!";
+		else {
+			if (command.contains("edit") || command.contains("remove")
+					|| command.contains("add")) {
+				split = command.split("/");
+				command = split[0];
+			}
+			switch (command.toLowerCase()) {
+			case "help":
+				return "The commands are: help, add, remove, read, edit. Please try again: ";
+			case "add":
+				if (!(currentUser instanceof Doctor))
+					return "Unauthorized.";
+				else
+					return addPatient(in, out, currentUser);
+			case "remove":
+				if (!(currentUser instanceof Agent))
+					return "Unauthorized";
+				else
+					return removeEntry(in, out, currentUser);
+			case "read":
+				return readJournal(in, out, currentUser);
+			case "edit":
+				if (!((currentUser instanceof Caretaker)))
+					return "Unauthorized";
+				else {
+					return editJournal(split, out, currentUser);
+				}
+
+			default:
+				return "No valid command entered, please try again!";
+			}
 		}
 	}
 
-	private String editJournal(BufferedReader in, PrintWriter out,
+	private String editJournal(String[] splitString, PrintWriter out,
 			User currentUser) throws Exception {
-		String entryString = sendRequest(
-				"Enter patients social security number, journalentry no., and the edit. Seperate with /: ",
-				in, out);
-		String[] split = entryString.split("/", 3);
-		System.out.println(split[0]);
-		// out.flush();
 
-		journal = patientJournals.get(split[0]);
-		journal.add(Integer.parseInt(split[1]),
-				journal.get(Integer.parseInt(split[1])) + "\n" + split[2]);
+		System.out.println(splitString[1]);
+		// out.flush();
+		patientJournals.get(splitString[1]).add(splitString[2]);
+		int size = patientJournals.get(splitString[1]).size();
 		// int entry = Integer.parseInt(sendRequest(
 		// "Which entry do you want to remove?", in, out));
 
-		return journal.get(Integer.parseInt(split[1]));
+		return patientJournals.get(splitString[1]).get(size - 1) + " \n";
 	}
 
 	private String readJournal(BufferedReader in, PrintWriter out,
@@ -225,7 +231,7 @@ public class Server implements Runnable {
 		(new Thread(this)).start();
 	} // calls run()
 
-	private static void fill() {
+	private void fill() {
 		patient1.add("Entry 1: Patient is cray-cray");
 		patient1.add("Entry 2: Patient suspects he is a chihuauhua");
 		patient2.add("Everything is fine, nothing to see here");
