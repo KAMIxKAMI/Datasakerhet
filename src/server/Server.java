@@ -47,12 +47,10 @@ public class Server implements Runnable {
 			SSLSocket socket = (SSLSocket) serverSocket.accept();
 			newListener();
 			SSLSession session = socket.getSession();
-			X509Certificate cert = (X509Certificate) session
-					.getPeerCertificateChain()[0];
+			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			String subject = cert.getSubjectDN().getName();
 
-			String info[] = new String[] {
-					subject.split("CN=")[1].split(",")[0], // PNbr
+			String info[] = new String[] { subject.split("CN=")[1].split(",")[0], // PNbr
 					subject.split("OU=")[1].split(",")[0], // Division
 					subject.split("O=")[1].split(",")[0], // Usertype
 					subject.split("L=")[1].split(",")[0], // Name
@@ -60,18 +58,14 @@ public class Server implements Runnable {
 
 			numConnectedClients++;
 			System.out.println("client connected");
-			System.out.println("client name (cert subject DN field): "
-					+ subject);
+			System.out.println("client name (cert subject DN field): " + subject);
 			System.out.println("issuer: " + cert.getIssuerDN().getName());
-			System.out
-					.println("serialno: " + cert.getSerialNumber().toString());
-			System.out.println(numConnectedClients
-					+ " concurrent connection(s)\n");
+			System.out.println("serialno: " + cert.getSerialNumber().toString());
+			System.out.println(numConnectedClients + " concurrent connection(s)\n");
 			PrintWriter out = null;
 			BufferedReader in = null;
 			out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			// String clientMsg = null;
 
 			// password implementation
@@ -98,9 +92,7 @@ public class Server implements Runnable {
 				// fix commands
 				String reply = "";
 				do {
-					reply = executeCommand(
-							sendRequest("Enter a command: ", in, out), in, out,
-							currentUser);
+					reply = executeCommand(sendRequest("Enter a command: ", in, out), in, out, currentUser);
 					logg(reply);
 					// System.out.println("received '" + clientMsg +
 					// "' from client");
@@ -119,8 +111,7 @@ public class Server implements Runnable {
 			writer.close();
 			numConnectedClients--;
 			System.out.println("client disconnected");
-			System.out.println(numConnectedClients
-					+ " concurrent connection(s)\n");
+			System.out.println(numConnectedClients + " concurrent connection(s)\n");
 		} catch (IOException e) {
 			System.out.println("Client died: " + e.getMessage());
 			e.printStackTrace();
@@ -131,15 +122,14 @@ public class Server implements Runnable {
 		}
 	}
 
-	private String executeCommand(String command, BufferedReader in,
-			PrintWriter out, User currentUser) throws Exception {
+	private String executeCommand(String command, BufferedReader in, PrintWriter out, User currentUser)
+			throws Exception {
 		// command ="";
 		logg(command);
 		if (command.equals(null))
 			return "No valid command entered, please try again!";
 		else {
-			if (command.contains("edit") || command.contains("remove")
-					|| command.contains("add")) {
+			if (command.contains("edit") || command.contains("remove") || command.contains("add")) {
 				split = command.split("/");
 				command = split[0];
 			}
@@ -155,7 +145,7 @@ public class Server implements Runnable {
 				if (!(currentUser instanceof Agent))
 					return "Unauthorized";
 				else
-					return removeEntry(in, out, currentUser);
+					return removeEntry(split, out, currentUser);
 			case "read":
 				return readJournal(in, out, currentUser);
 			case "edit":
@@ -171,8 +161,7 @@ public class Server implements Runnable {
 		}
 	}
 
-	private String editJournal(String[] splitString, PrintWriter out,
-			User currentUser) throws Exception {
+	private String editJournal(String[] splitString, PrintWriter out, User currentUser) throws Exception {
 
 		System.out.println(splitString[1]);
 		// out.flush();
@@ -184,25 +173,33 @@ public class Server implements Runnable {
 		return patientJournals.get(splitString[1]).get(size - 1) + " \n";
 	}
 
-	private String readJournal(BufferedReader in, PrintWriter out,
-			User currentUser) throws Exception {
+	private String readJournal(BufferedReader in, PrintWriter out, User currentUser) throws Exception {
 		StringBuilder entry = new StringBuilder("");
 
 		if (currentUser instanceof Caretaker) {
 
-			ArrayList<ArrayList> tempDivision = division
-					.get(((Caretaker) currentUser).getDivision());
+			ArrayList<ArrayList> tempDivision = division.get(((Caretaker) currentUser).getDivision());
 
 			for (ArrayList<String> i : tempDivision) {
+				entry.append("New patient: ");
 				for (String j : i) {
 					entry.append("\n-----------\n" + j + "\n-----------\n");
 					logg(currentUser.getName() + " has accessed " + entry);
 				}
-				return entry.toString();
 			}
+			return entry.toString();
+		} else if (currentUser instanceof Agent) {
+			for (String key : patientJournals.keySet()) {
+				entry.append("New Patient \n" + key + "\n");
+				ArrayList<String> patient = patientJournals.get(key);
+				for (String journalEntry : patient) {
+					entry.append("----------- \n" + journalEntry + "\n-----------\n");
+					logg(currentUser.getName() + " has accessed " + entry);
+				}
+			}
+
 		} else {
-			ArrayList<String> journal = patientJournals.get(currentUser
-					.getPNbr());
+			ArrayList<String> journal = patientJournals.get(currentUser.getPNbr());
 			for (String s : journal) {
 				entry.append("----------- \n" + s + "\n-----------\n");
 				logg(currentUser.getName() + " has accessed " + entry);
@@ -211,20 +208,18 @@ public class Server implements Runnable {
 		return entry.toString();
 	}
 
-	private String removeEntry(BufferedReader in, PrintWriter out,
-			User currentUser) throws Exception {
+	private String removeEntry(String[] splitString, PrintWriter out, User currentUser) throws Exception {
 
-		String removalEntry = sendRequest(
-				"Enter patients social security number and which entry, seperate with /: ",
-				in, out);
-		String[] split = removalEntry.split("/");
-		journal = patientJournals.get(split[0]);
-		return journal.remove(split[1]) + " was removed.";
+		journal = patientJournals.get(splitString[1]);
+		return journal.remove(Integer.parseInt(splitString[2]) - 1) + " was removed.";
 	}
 
-	private String addPatient(BufferedReader in, PrintWriter out,
-			User currentUser) {
-		return null;
+	private String addPatient(BufferedReader in, PrintWriter out, User currentUser) {
+		ArrayList patient0 = new ArrayList<String>();
+		patient0.add(split[3]);
+		division.get(split[2]).add(patient0);
+		patientJournals.put(split[1], patient0);
+		return "Patient was succesfully added to division " + split[2] + " \n";
 	}
 
 	private void newListener() {
@@ -243,8 +238,7 @@ public class Server implements Runnable {
 		division.put("2", section2);
 	}
 
-	private String sendRequest(String request, BufferedReader in,
-			PrintWriter out) throws Exception {
+	private String sendRequest(String request, BufferedReader in, PrintWriter out) throws Exception {
 		System.out.print("sending '" + request + "' to client...");
 		String clientAns = in.readLine();
 		if (clientAns == null)
@@ -258,17 +252,13 @@ public class Server implements Runnable {
 			SSLServerSocketFactory ssf = null;
 			try { // set up key manager to perform server authentication
 				SSLContext ctx = SSLContext.getInstance("TLS");
-				KeyManagerFactory kmf = KeyManagerFactory
-						.getInstance("SunX509");
-				TrustManagerFactory tmf = TrustManagerFactory
-						.getInstance("SunX509");
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 				KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
 				char[] password = "password".toCharArray();
-				ks.load(new FileInputStream(
-						"./cert/server/Server/serverkeystore"), password); // keystore
-				ts.load(new FileInputStream(
-						"./cert/server/Server/servertruststore"), password);
+				ks.load(new FileInputStream("./cert/server/Server/serverkeystore"), password); // keystore
+				ts.load(new FileInputStream("./cert/server/Server/servertruststore"), password);
 				// password
 				// (storepass)
 				// password

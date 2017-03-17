@@ -24,8 +24,7 @@ public class Client {
 	BufferedReader in;
 
 	public void init() throws Exception {
-		BufferedReader sysin = new BufferedReader(new InputStreamReader(
-				System.in));
+		BufferedReader sysin = new BufferedReader(new InputStreamReader(System.in));
 		String host = "localhost";
 		int port = 1994;
 
@@ -39,17 +38,13 @@ public class Client {
 
 				KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
-				KeyManagerFactory kmf = KeyManagerFactory
-						.getInstance("SunX509");
-				TrustManagerFactory tmf = TrustManagerFactory
-						.getInstance("SunX509");
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+				TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 				SSLContext ctx = SSLContext.getInstance("TLS");
-				ks.load(new FileInputStream("./cert/client/" + user
-						+ "keystore"), password); // keystore);
+				ks.load(new FileInputStream("./cert/client/" + user + "keystore"), password); // keystore);
 				// password
 				// (storepass)
-				ts.load(new FileInputStream("./cert/client/clienttruststore"),
-						password);
+				ts.load(new FileInputStream("./cert/client/clienttruststore"), password);
 				// truststore
 				// password
 				// (storepass);
@@ -58,8 +53,7 @@ public class Client {
 				ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 				factory = ctx.getSocketFactory();
 			} catch (FileNotFoundException e) {
-				System.out
-						.println("Couldn't find trust- and/or keystore in \"cert/client\".");
+				System.out.println("Couldn't find trust- and/or keystore in \"cert/client\".");
 				System.exit(0);
 			} catch (Exception e) {
 				System.out.println("Wrong password and/or username!");
@@ -78,20 +72,16 @@ public class Client {
 			socket.startHandshake();
 			// System.out.println("hejhej");
 			SSLSession session = socket.getSession();
-			X509Certificate cert = (X509Certificate) session
-					.getPeerCertificateChain()[0];
+			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			String subject = cert.getSubjectDN().getName();
-			System.out
-					.println("certificate name (subject DN field) on certificate received from server:\n"
-							+ subject + "\n");
+			System.out.println(
+					"certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
 			System.out.println("socket after handshake:\n" + socket + "\n");
 			System.out.println("secure connection established\n\n");
 
-			BufferedReader read = new BufferedReader(new InputStreamReader(
-					System.in));
+			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(
-					socket.getInputStream()));
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			// System.out.println("penis");
 			String input;
 			System.out.println(readFromServer());
@@ -107,16 +97,18 @@ public class Client {
 				case "exit":
 					break;
 				case "remove":
-					System.out
-							.println("Enter patients social security number and which entry, seperate with /: ");
+					System.out.println("Enter patients social security number and which entry, seperate with /: ");
 					input = input + "/" + read.readLine();
 					break;
 				case "edit":
-					System.out
-							.println("Enter patients social security number and the new journal entry. Separate with /: ");
+					System.out.println(
+							"Enter patients social security number and the new journal entry. Separate with /: ");
 					input = input + "/" + read.readLine();
 					break;
 				case "add":
+					System.out.println(
+							"Enter patients ssn, a section number (1 or 2) and primary journal entry. Separate with /: ");
+					input = input + "/" + read.readLine();
 					break;
 				}
 
