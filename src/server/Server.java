@@ -91,6 +91,7 @@ public class Server implements Runnable {
 			if ((currentUser != null)) {
 				// fix commands
 				String reply = "";
+				System.out.println("Hej Axel, jag är på rad 94 i Server.java");
 				do {
 					reply = executeCommand(sendRequest("Enter a command: ", in, out), in, out, currentUser);
 					logg(reply);
